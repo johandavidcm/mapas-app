@@ -33,7 +33,7 @@ class _MapaPageState extends State<MapaPage> {
       ),
       floatingActionButton: Column(
         mainAxisAlignment: MainAxisAlignment.end,
-        children: [BtnUbicacion()],
+        children: [BtnUbicacion(), BtnSeguirUbicacion(), BtnMiRuta()],
       ),
     );
   }
@@ -41,6 +41,7 @@ class _MapaPageState extends State<MapaPage> {
   Widget crearMapa(MiUbicacionState state) {
     if (!state.existeUbicacion) return Center(child: Text('Ubicando...'));
     final mapaBloc = BlocProvider.of<MapaBloc>(context);
+    mapaBloc.add(OnNuevaUbicacion(state.ubicacion));
     final CameraPosition cameraPosition =
         CameraPosition(target: state.ubicacion, zoom: 15.0);
     return GoogleMap(
@@ -49,6 +50,11 @@ class _MapaPageState extends State<MapaPage> {
       myLocationEnabled: true,
       zoomControlsEnabled: false,
       onMapCreated: mapaBloc.initMapa,
+      polylines: mapaBloc.state.polylines.values.toSet(),
+      onCameraMove: (cameraPosition) {
+        // cameraPosition.target = LatLng
+        mapaBloc.add(OnMovioMapa(cameraPosition.target));
+      },
     );
   }
 }

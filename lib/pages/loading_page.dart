@@ -21,8 +21,9 @@ class _LoadingPageState extends State<LoadingPage> with WidgetsBindingObserver {
   void didChangeAppLifecycleState(AppLifecycleState state) async {
     if (state == AppLifecycleState.resumed) {
       if (await Geolocator.isLocationServiceEnabled()) {
-        Navigator.pushReplacement(
-            context, navegarMapaFadeIn(context, MapaPage()));
+        // Navigator.pushReplacement(
+        //     context, navegarMapaFadeIn(context, MapaPage()));
+        Navigator.pushReplacementNamed(context, 'mapa');
       }
     }
     super.didChangeAppLifecycleState(state);
