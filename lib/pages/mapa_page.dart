@@ -26,10 +26,16 @@ class _MapaPageState extends State<MapaPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: BlocBuilder<MiUbicacionBloc, MiUbicacionState>(
-        builder: (context, state) {
-          return crearMapa(state);
-        },
+      body: Stack(
+        children: [
+          BlocBuilder<MiUbicacionBloc, MiUbicacionState>(
+            builder: (context, state) {
+              return crearMapa(state);
+            },
+          ),
+          Positioned(top: 10.0, child: SearchBar()),
+          MarcadorManual()
+        ],
       ),
       floatingActionButton: Column(
         mainAxisAlignment: MainAxisAlignment.end,
@@ -44,16 +50,21 @@ class _MapaPageState extends State<MapaPage> {
     mapaBloc.add(OnNuevaUbicacion(state.ubicacion));
     final CameraPosition cameraPosition =
         CameraPosition(target: state.ubicacion, zoom: 15.0);
-    return GoogleMap(
-      initialCameraPosition: cameraPosition,
-      myLocationButtonEnabled: false,
-      myLocationEnabled: true,
-      zoomControlsEnabled: false,
-      onMapCreated: mapaBloc.initMapa,
-      polylines: mapaBloc.state.polylines.values.toSet(),
-      onCameraMove: (cameraPosition) {
-        // cameraPosition.target = LatLng
-        mapaBloc.add(OnMovioMapa(cameraPosition.target));
+
+    return BlocBuilder<MapaBloc, MapaState>(
+      builder: (context, _) {
+        return GoogleMap(
+          initialCameraPosition: cameraPosition,
+          myLocationButtonEnabled: false,
+          myLocationEnabled: true,
+          zoomControlsEnabled: false,
+          onMapCreated: mapaBloc.initMapa,
+          polylines: mapaBloc.state.polylines.values.toSet(),
+          onCameraMove: (cameraPosition) {
+            // cameraPosition.target = LatLng
+            mapaBloc.add(OnMovioMapa(cameraPosition.target));
+          },
+        );
       },
     );
   }
