@@ -47,7 +47,6 @@ class _AccesoGpsPageState extends State<AccesoGpsPage>
                   style: TextStyle(color: Colors.white),
                 ),
                 onPressed: () async {
-                  //TODO: Verificar Permisos
                   final status = await Permission.location.request();
                   this.accesoGPS(status);
                 })
