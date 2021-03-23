@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:map_app/bloc/mapa/mapa_bloc.dart';
 import 'package:map_app/bloc/mi_ubicacion/mi_ubicacion_bloc.dart';
+import 'package:map_app/widgets/widgets.dart';
 
 class MapaPage extends StatefulWidget {
   @override
@@ -16,15 +19,36 @@ class _MapaPageState extends State<MapaPage> {
 
   @override
   void dispose() {
+    BlocProvider.of<MiUbicacionBloc>(context).cancelarSeguimiento();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Center(
-        child: Text('MapaPage'),
+      body: BlocBuilder<MiUbicacionBloc, MiUbicacionState>(
+        builder: (context, state) {
+          return crearMapa(state);
+        },
       ),
+      floatingActionButton: Column(
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: [BtnUbicacion()],
+      ),
+    );
+  }
+
+  Widget crearMapa(MiUbicacionState state) {
+    if (!state.existeUbicacion) return Center(child: Text('Ubicando...'));
+    final mapaBloc = BlocProvider.of<MapaBloc>(context);
+    final CameraPosition cameraPosition =
+        CameraPosition(target: state.ubicacion, zoom: 15.0);
+    return GoogleMap(
+      initialCameraPosition: cameraPosition,
+      myLocationButtonEnabled: false,
+      myLocationEnabled: true,
+      zoomControlsEnabled: false,
+      onMapCreated: mapaBloc.initMapa,
     );
   }
 }

@@ -11,16 +11,27 @@ part 'mi_ubicacion_state.dart';
 class MiUbicacionBloc extends Bloc<MiUbicacionEvent, MiUbicacionState> {
   MiUbicacionBloc() : super(MiUbicacionState());
 
+  StreamSubscription<Position> _positionSubscription;
+
   void iniciarSeguimiento() {
-    Geolocator.getPositionStream(
+    this._positionSubscription = Geolocator.getPositionStream(
             desiredAccuracy: LocationAccuracy.high, distanceFilter: 10)
         .listen((Position position) {
-      print(position);
+      final nuevaUbicacion = LatLng(position.latitude, position.longitude);
+      add(OnUbicacionCambio(nuevaUbicacion));
     });
+  }
+
+  void cancelarSeguimiento() {
+    this._positionSubscription?.cancel();
   }
 
   @override
   Stream<MiUbicacionState> mapEventToState(
     MiUbicacionEvent event,
-  ) async* {}
+  ) async* {
+    if (event is OnUbicacionCambio) {
+      yield state.copyWith(existeUbicacion: true, ubicacion: event.ubicacion);
+    }
+  }
 }
